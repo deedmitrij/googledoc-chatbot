@@ -2,6 +2,8 @@
 
 This is a **Flask-based chatbot** that interacts with **Google Docs** using **Google Gemini** LLM to extract text. The chatbot allows users to input a Google Docs link, select a feature, and get relevant test cases.
 
+<img src="https://github.com/user-attachments/assets/abe127f5-54ef-401e-a1be-b00a8a163b9f" alt="Screenshot 2025-03-07 224025" width="300">
+
 ---
 
 ## 📑 Table of Contents
