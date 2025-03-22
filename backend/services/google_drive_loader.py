@@ -29,20 +29,6 @@ class GoogleDocLoader:
         )
         return build("docs", "v1", credentials=creds)
 
-    @staticmethod
-    def extract_doc_id(doc_url: str) -> str:
-        """
-        Extracts the document ID from a Google Docs URL.
-
-        Args:
-            doc_url (str): The full URL of the Google Document.
-
-        Returns:
-            str: The extracted document ID.
-        """
-        match = re.search(r"document/d/([a-zA-Z0-9-_]+)", doc_url)
-        return match.group(1)
-
     def load_document(self, doc_url: str) -> str:
         """
         Extracts text content from a Google Doc given its document URL.
@@ -53,13 +39,13 @@ class GoogleDocLoader:
         Returns:
             str: The extracted text content from the document.
         """
-        doc_id = self.extract_doc_id(doc_url)
+        doc_id = re.search(r"document/d/([a-zA-Z0-9-_]+)", doc_url).group(1)
         try:
             doc = self.service.documents().get(documentId=doc_id).execute()
         except HttpError as e:
-            return f"⚠️ Google Docs API Error: {e.error_details}"
+            raise Exception(f"⚠️ Google Docs API Error: {e.error_details}")
         except Exception as e:
-            return f"⚠️ Unexpected Error: {str(e)}"
+            raise Exception(f"⚠️ Unexpected Error: {str(e)}")
         text = []
         for element in doc.get("body", {}).get("content", []):
             if "paragraph" in element:
