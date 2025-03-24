@@ -1,11 +1,11 @@
 import re
 from flask import Blueprint, request, jsonify, render_template
-from backend.app.gemini_service import GeminiService
-from backend.app.google_drive_loader import GoogleDocLoader
-from backend.app.session_manager import session_manager
+from .document_manager import DocumentManager
+from backend.app.session_manager import SessionManager
 
-gemini_service = GeminiService()
-google_doc_loader = GoogleDocLoader()
+
+document_manager = DocumentManager()
+session_manager = SessionManager()
 
 chat_bp = Blueprint("chat", __name__)
 
@@ -20,54 +20,75 @@ def chat():
     """Handles chatbot interactions."""
     data = request.get_json()
     user_id = data.get("user_id")
-    user_message = data.get("message", "").strip()
-
-    if not user_message:
-        return jsonify({"error": "Message is required"}), 400
+    user_message = data.get("message")
 
     session = session_manager.get_session(user_id)
 
-    # Step 1: User sends Google Doc link
-    if not session:
+    if not session.get("documents_loaded"):
         google_docs_regex = r"https:\/\/docs\.google\.com\/document\/d\/[a-zA-Z0-9_-]+"
-        if not re.match(google_docs_regex, user_message):
-            return jsonify({"response": "⚠️ Invalid Google Docs link! Please provide a valid link."})
+        # Step 1: Expect first Google Doc link (Specification)
+        if not session.get("spec_doc_link"):
+            if not bool(re.match(google_docs_regex, user_message)):
+                return jsonify(
+                    {"response": "⚠️ Invalid Google Docs link! Please provide a valid specification document link."}
+                )
+            session_manager.set_spec_doc_link(user_id, user_message)
+            try:
+                document_manager.load_and_store_document(doc_link=session["spec_doc_link"],
+                                                         collection='specification',
+                                                         user_id=user_id)
+            except Exception as e:
+                session_manager.set_spec_doc_link(user_id, None)
+                return jsonify({'response': f"{e}<br><br>🔄 Send a new Google Doc link."})
+            return jsonify({"response": "Got it! Now, send me a Google Doc link to the test cases."})
 
-        session_manager.set_doc_link(user_id, user_message)
-        return jsonify({"response": "Got it! Now, which feature's test cases do you need?"})
+        # Step 2: Expect second Google Doc link (Test Cases)
+        elif not session.get("test_cases_doc_link"):
+            if not bool(re.match(google_docs_regex, user_message)):
+                return jsonify(
+                    {"response": "⚠️ Invalid Google Docs link! Please provide a valid specification document link."}
+                )
+            session_manager.set_test_cases_doc_link(user_id, user_message)
+            try:
+                document_manager.load_and_store_document(doc_link=session["test_cases_doc_link"],
+                                                         collection='test_cases',
+                                                         user_id=user_id)
+            except Exception as e:
+                session_manager.set_test_cases_doc_link(user_id, None)
+                return jsonify({'response': f"{e}<br><br>🔄 Send a new Google Doc link."})
+            session_manager.set_documents_loaded(user_id, True)
+            return jsonify({"response": "Thanks! Now, which feature's test cases do you need?"})
 
-    # Step 2: User sends feature name
-    elif session["feature"] is None:
+    # Step 3: Expect feature name
+    elif not session.get("feature"):
         session_manager.set_feature(user_id, user_message)
-        doc_link = session["doc_link"]
 
-        # Load document & extract test cases
-        doc_text = google_doc_loader.load_document(doc_link)
-        if 'Error' in doc_text:
-            session_manager.clear_session(user_id)
-            return jsonify({'response': f"{doc_text}<br><br>🔄 Send a new Google Doc link."})
+        # Retrieve relevant data
+        relevant_specs = document_manager.find_similar_data_to_query(query=user_message,
+                                                                     collection='specification',
+                                                                     user_id=user_id)
+        relevant_test_cases = document_manager.find_similar_data_to_query(query=user_message,
+                                                                          collection='test_cases',
+                                                                          user_id=user_id)
 
-        # Ask Gemini to extract test cases
-        feature = user_message
-        test_cases = gemini_service.get_test_cases(doc_text, feature)
-        if 'Error' in test_cases:
-            session_manager.set_feature(user_id, None)
-            return jsonify({
-                "response": f"{test_cases}<br><br>🔄 Please enter a valid feature name."
-            })
+        # Generate test cases
+        test_cases = document_manager.generate_test_cases(relevant_specs=relevant_specs,
+                                                          relevant_test_cases=relevant_test_cases,
+                                                          feature=user_message)
+
         return jsonify({
-            "response": f"Here are the test cases for <b>{feature}</b>:<br>{test_cases}",
-            "menu": ["🔄 Extract another feature", "📄 Upload new document", "❌ End session"]
+            "response": test_cases,
+            "menu": ["🔄 Extract another feature", "📄 Upload new documents", "❌ End session"]
         })
 
-    # Step 3: Handle menu selection
+    # Step 4: Handle menu selection
     elif "extract another feature" in user_message.lower():
         session_manager.set_feature(user_id, None)
         return jsonify({"response": "Which feature's test cases do you need next?"})
 
-    elif "upload new document" in user_message.lower():
+    elif "upload new documents" in user_message.lower():
         session_manager.clear_session(user_id)
-        return jsonify({"response": "Send me the new Google Doc link!"})
+        return jsonify({"response": "Send me the new specification document link!"})
 
     elif "end session" in user_message.lower():
         session_manager.clear_session(user_id)

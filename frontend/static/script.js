@@ -3,7 +3,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const userInput = document.getElementById("user-input");
     const sendBtn = document.getElementById("send-btn");
 
-    appendMessage("Bot: Welcome! Please provide a Google Doc link to get started.", "bot");
+    function getUserId() {
+        let userId = sessionStorage.getItem("user_id");
+        if (!userId) {
+            userId = crypto.randomUUID();
+            sessionStorage.setItem("user_id", userId);
+        }
+        return userId;
+    }
+
+    const userId = getUserId();
+
+    appendMessage("Bot: Welcome! Please provide a Google Doc link to the specification.", "bot");
 
     sendBtn.addEventListener("click", sendMessage);
     userInput.addEventListener("keypress", function (event) {
@@ -22,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch("/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user_id: "test_user", message: userMessage }),
+            body: JSON.stringify({ user_id: userId, message: userMessage }),
         })
         .then(response => response.json())
         .then(data => {
@@ -31,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 appendMenuOptions(data.menu);
             }
             if (data.reset) {
-            setTimeout(resetChat, 2000);
+                setTimeout(resetChat, 2000);
             }
         })
         .catch(error => console.error("Error:", error));
@@ -46,26 +57,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function appendMenuOptions(options) {
-    const menuDiv = document.createElement("div");
-    menuDiv.classList.add("menu-options");
+        const menuDiv = document.createElement("div");
+        menuDiv.classList.add("menu-options");
 
-    options.forEach(option => {
-        const button = document.createElement("button");
-        button.textContent = option;
+        options.forEach(option => {
+            const button = document.createElement("button");
+            button.textContent = option;
 
-        button.addEventListener("click", function () {
-            userInput.value = option;
-            sendMessage();
+            button.addEventListener("click", function () {
+                userInput.value = option;
+                sendMessage();
+            });
+
+            menuDiv.appendChild(button);
         });
 
-        menuDiv.appendChild(button);
-    });
-
-    chatBox.appendChild(menuDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
+        chatBox.appendChild(menuDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function resetChat() {
-    location.reload();
+        location.reload();
     }
 });
