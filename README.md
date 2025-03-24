@@ -1,9 +1,14 @@
 # 🗎 AI-Powered Chatbot for Google Docs
 
-This is a **Flask-based chatbot** that interacts with **Google Docs** using **Google Gemini** LLM to extract text. The chatbot allows users to input a Google Docs link, select a feature, and get relevant test cases.
+This is a **Flask-based chatbot** powered by **Retrieval-Augmented Generation (RAG)** using **Google Gemini LLM**, designed to analyze **Google Docs** and generate test cases.  
 
-<img src="https://github.com/user-attachments/assets/abe127f5-54ef-401e-a1be-b00a8a163b9f" alt="Screenshot 2025-03-07 224025" width="300">
+<img src="https://github.com/user-attachments/assets/5afb31f1-3518-46cc-8441-8e966e17a65c" alt="Chatbot screenshot" width="300">
 
+## 🚀 How It Works  
+1. **Upload Documents**: Provide a **specification document** and a **test cases document**.  
+2. **Input a Query**: Enter a **feature query** or a **custom user query**.  
+3. **Processing with RAG**: The chatbot retrieves relevant sections, processes them with **Google Gemini LLM**, and generates new test cases.  
+4. **Receive Results**: Get an updated set of **test cases tailored to user query and document content**.  
 ---
 
 ## 📑 Table of Contents
