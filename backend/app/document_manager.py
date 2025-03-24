@@ -45,7 +45,7 @@ class DocumentManager:
         self.vector_db.store_data(chunks=chunks_to_store, embeddings=embeddings,
                                   doc_ids=doc_ids, collection=collection, metadata=metadata)
 
-    def embed_content(self, content: str | List[str], task_type: str) -> List[List[float]] | [List[float]]:
+    def embed_content(self, content: str | List[str], task_type: str) -> List[List[float]] | List[float]:
         """
         Generates embeddings for the given content.
 
@@ -54,7 +54,7 @@ class DocumentManager:
             task_type (str): The type of embedding task.
 
         Returns:
-            List[List[float]] | [List[float]]: A list of vector embeddings for the provided content.
+            List[List[float]] | List[float]: A list of vector embeddings for the provided content.
         """
         return self.gemini_service.embed_content(content=content, task_type=task_type)
 

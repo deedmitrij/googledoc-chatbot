@@ -27,7 +27,7 @@ class GeminiService:
             return f"⚠️ Error processing request: {str(e)}"
 
     @staticmethod
-    def embed_content(content: str | List[str], task_type: str) -> List[List[float]] | [List[float]]:
+    def embed_content(content: str | List[str], task_type: str) -> List[List[float]] | List[float]:
         """
         Generates embeddings for the given content.
 
@@ -36,7 +36,7 @@ class GeminiService:
             task_type (str): The embedding type.
 
         Returns:
-            List[List[float]] | [List[float]]: A list representing the content's embedding.
+            List[List[float]] | List[float]: A list representing the content's embedding.
         """
         response = genai.embed_content(model="models/embedding-001", content=content, task_type=task_type)
         return response["embedding"]
