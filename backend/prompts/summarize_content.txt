@@ -1,0 +1,8 @@
+You are an expert QA engineer. Summarize the following document content in 3-5 bullet points.
+Keep it clear and structured.
+
+**Content:**
+"{content}"
+
+Output format must be as normal text, but including appropriate HTML tags
+in the places of line breaks, paragraph breaks, text highlighting, lists, etc.

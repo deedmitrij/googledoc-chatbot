@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -9,11 +10,11 @@ GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 GOOGLE_CREDENTIALS_PATH = os.getenv("GOOGLE_CREDENTIALS_PATH", "credentials.json")
 
 # Get the project's root directory
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 # If a relative path is provided, resolve it based on the project root
 if not os.path.isabs(GOOGLE_CREDENTIALS_PATH):
-    GOOGLE_CREDENTIALS_PATH = os.path.join(PROJECT_ROOT, GOOGLE_CREDENTIALS_PATH)
+    GOOGLE_CREDENTIALS_PATH = PROJECT_ROOT / GOOGLE_CREDENTIALS_PATH
 
 # Validate API Key
 if not GEMINI_API_KEY:
