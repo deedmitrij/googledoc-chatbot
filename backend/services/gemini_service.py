@@ -1,5 +1,6 @@
 import google.generativeai as genai
 from typing import List
+from langchain_google_genai import ChatGoogleGenerativeAI
 from backend.config import GEMINI_API_KEY
 
 
@@ -8,7 +9,14 @@ class GeminiService:
 
     def __init__(self):
         genai.configure(api_key=GEMINI_API_KEY)
-        self.model = genai.GenerativeModel("gemini-1.5-flash")
+        model = "gemini-1.5-flash"
+        self.native_model = genai.GenerativeModel(model)
+        self.langchain_model = ChatGoogleGenerativeAI(
+            model=model,
+            google_api_key=GEMINI_API_KEY,
+            temperature=0.3,
+            max_output_tokens=2048,
+        )
 
     def generate_content(self, prompt: str) -> str:
         """
@@ -21,7 +29,7 @@ class GeminiService:
             str: The generated content.
         """
         try:
-            response = self.model.generate_content(prompt)
+            response = self.native_model.generate_content(prompt)
             return response.text
         except Exception as e:
             return f"⚠️ Error processing request: {str(e)}"
