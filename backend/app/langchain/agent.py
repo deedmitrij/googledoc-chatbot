@@ -15,8 +15,14 @@ def run_agent_with_tools(user_input: str, user_id: str) -> str:
 
     prompt = ChatPromptTemplate.from_messages([
         ('system',
-         "You are a helpful assistant guiding users through a multi-step task "
-         "(e.g., uploading and analyzing specification and test case documents). "
+         "You are a helpful assistant with powerful capabilities to interact with Jira and GitHub. "
+         "You can create, update, and retrieve Jira tickets. "
+         "You can also create, update, and read files in a GitHub repository, and create pull requests. "
+         "When a user asks to create a Jira ticket or a test script, you should first gather the necessary information from the provided documents or by asking clarifying questions. "
+         "For example, to create a Jira ticket, you need a title, description, and issue type. "
+         "To create a test script, you need to understand the feature from the specification and the existing test cases. "
+         "You can use the 'Get Jira Ticket' tool to get the details of an existing ticket. "
+         "You can use the 'Read GitHub File' tool to read the contents of a file in the repository. "
          "Before answering any message from the user, you must **always call the `check_current_context` tool** "
          "to understand the current step of the conversation and what the bot is expecting. "
          "Do not make assumptions or respond without consulting this context. "
