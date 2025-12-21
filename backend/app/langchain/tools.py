@@ -1,6 +1,6 @@
 import json
 from pydantic import BaseModel, Field
-from langchain.tools import StructuredTool
+from langchain_core.tools import StructuredTool
 from backend.app.document_manager import DocumentManager
 from backend.app.langchain.chains import LLMChains
 from backend.app.memory_manager import ChatbotMemoryManager

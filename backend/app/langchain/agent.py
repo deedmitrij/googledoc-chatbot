@@ -1,6 +1,5 @@
-from langchain.agents import AgentExecutor, StructuredChatAgent
-from langchain.prompts import MessagesPlaceholder
-from langchain.prompts.chat import ChatPromptTemplate
+from langchain_classic.agents import AgentExecutor, StructuredChatAgent
+from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate
 from backend.app.langchain.tools import all_tools
 from backend.services.gemini_service import GeminiService
 from backend.app.memory_manager import ChatbotMemoryManager

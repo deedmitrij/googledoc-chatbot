@@ -50,8 +50,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function appendMessage(message, sender) {
         const messageDiv = document.createElement("div");
-        messageDiv.classList.add(sender);
-        messageDiv.innerHTML = message;
+        messageDiv.classList.add("message", sender);
+
+        const textDiv = document.createElement("div");
+        textDiv.classList.add("text");
+        textDiv.innerHTML = message;
+
+        messageDiv.appendChild(textDiv);
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
     }

@@ -1,4 +1,4 @@
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableSequence
 from backend.services.gemini_service import GeminiService
 from backend.config import PROJECT_ROOT
