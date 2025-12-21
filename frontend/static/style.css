@@ -82,6 +82,10 @@ body {
     margin-top: 5px;
 }
 
+.message.consecutive {
+    margin-top: -10px;
+}
+
 .input-container {
     display: flex;
     align-items: center;

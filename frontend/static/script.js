@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const userId = getUserId();
+    let lastSender = null;
 
     appendMessage("Welcome! Please provide a Google Doc link to the specification.", "bot");
 
@@ -52,9 +53,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const messageDiv = document.createElement("div");
         messageDiv.classList.add("message", sender);
 
-        const senderLabel = document.createElement("div");
-        senderLabel.classList.add("sender-label");
-        senderLabel.textContent = sender === "bot" ? "Bot" : "You";
+        if (sender !== lastSender) {
+            const senderLabel = document.createElement("div");
+            senderLabel.classList.add("sender-label");
+            senderLabel.textContent = sender === "bot" ? "Bot" : "You";
+            messageDiv.appendChild(senderLabel);
+        } else {
+            messageDiv.classList.add("consecutive");
+        }
 
         const textDiv = document.createElement("div");
         textDiv.classList.add("text");
@@ -64,12 +70,12 @@ document.addEventListener("DOMContentLoaded", function () {
         timestamp.classList.add("timestamp");
         timestamp.textContent = new Date().toLocaleTimeString();
 
-        messageDiv.appendChild(senderLabel);
         messageDiv.appendChild(textDiv);
         messageDiv.appendChild(timestamp);
 
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
+        lastSender = sender;
     }
 
     function appendMenuOptions(options) {
