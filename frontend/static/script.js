@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const userId = getUserId();
 
-    appendMessage("Bot: Welcome! Please provide a Google Doc link to the specification.", "bot");
+    appendMessage("Welcome! Please provide a Google Doc link to the specification.", "bot");
 
     sendBtn.addEventListener("click", sendMessage);
     userInput.addEventListener("keypress", function (event) {
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const userMessage = userInput.value.trim();
         if (!userMessage) return;
 
-        appendMessage("You: " + userMessage, "user");
+        appendMessage(userMessage, "user");
         userInput.value = "";
 
         fetch("/chat", {
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
-            appendMessage("Bot: " + data.response, "bot");
+            appendMessage(data.response, "bot");
             if (data.menu) {
                 appendMenuOptions(data.menu);
             }
@@ -52,11 +52,22 @@ document.addEventListener("DOMContentLoaded", function () {
         const messageDiv = document.createElement("div");
         messageDiv.classList.add("message", sender);
 
+        const senderLabel = document.createElement("div");
+        senderLabel.classList.add("sender-label");
+        senderLabel.textContent = sender === "bot" ? "Bot" : "You";
+
         const textDiv = document.createElement("div");
         textDiv.classList.add("text");
         textDiv.innerHTML = message;
 
+        const timestamp = document.createElement("div");
+        timestamp.classList.add("timestamp");
+        timestamp.textContent = new Date().toLocaleTimeString();
+
+        messageDiv.appendChild(senderLabel);
         messageDiv.appendChild(textDiv);
+        messageDiv.appendChild(timestamp);
+
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
