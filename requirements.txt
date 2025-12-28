@@ -12,3 +12,4 @@ python-dotenv
 jira
 PyGithub
 faiss-cpu
+langchain-mcp-adapters

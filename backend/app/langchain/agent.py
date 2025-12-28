@@ -1,6 +1,7 @@
+import asyncio
 from langchain_classic.agents import AgentExecutor, StructuredChatAgent
 from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate
-from backend.app.langchain.tools import all_tools
+from langchain_mcp_adapters.client import MultiServerMCPClient, load_mcp_tools
 from backend.services.gemini_service import GeminiService
 from backend.app.memory_manager import ChatbotMemoryManager
 
@@ -8,9 +9,30 @@ from backend.app.memory_manager import ChatbotMemoryManager
 gemini_service = GeminiService()
 memory_manager = ChatbotMemoryManager()
 
+# Configure the MCP client
+mcp_client = MultiServerMCPClient({
+    "jira": {
+        "transport": "stdio",
+        "command": "python",
+        "args": ["-m", "backend.mcp_servers.jira_mcp_server"],
+    },
+    "github": {
+        "transport": "stdio",
+        "command": "python",
+        "args": ["-m", "backend.mcp_servers.github_mcp_server"],
+    },
+})
+
+async def load_tools():
+    async with mcp_client.session("jira") as jira_session:
+        async with mcp_client.session("github") as github_session:
+            jira_tools = await load_mcp_tools(jira_session)
+            github_tools = await load_mcp_tools(github_session)
+            return jira_tools + github_tools
 
 def run_agent_with_tools(user_input: str, user_id: str) -> str:
     memory = memory_manager.get_memory(user_id)
+    all_tools = asyncio.run(load_tools())
 
     prompt = ChatPromptTemplate.from_messages([
         ('system',
