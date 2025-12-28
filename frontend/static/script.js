@@ -13,8 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const userId = getUserId();
+    let lastSender = null;
 
-    appendMessage("Bot: Welcome! Please provide a Google Doc link to the specification.", "bot");
+    appendMessage("Welcome! Please provide a Google Doc link to the specification.", "bot");
 
     sendBtn.addEventListener("click", sendMessage);
     userInput.addEventListener("keypress", function (event) {
@@ -27,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const userMessage = userInput.value.trim();
         if (!userMessage) return;
 
-        appendMessage("You: " + userMessage, "user");
+        appendMessage(userMessage, "user");
         userInput.value = "";
 
         fetch("/chat", {
@@ -37,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
-            appendMessage("Bot: " + data.response, "bot");
+            appendMessage(data.response, "bot");
             if (data.menu) {
                 appendMenuOptions(data.menu);
             }
@@ -50,10 +51,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function appendMessage(message, sender) {
         const messageDiv = document.createElement("div");
-        messageDiv.classList.add(sender);
-        messageDiv.innerHTML = message;
+        messageDiv.classList.add("message", sender);
+
+        if (sender !== lastSender) {
+            const senderLabel = document.createElement("div");
+            senderLabel.classList.add("sender-label");
+            senderLabel.textContent = sender === "bot" ? "Bot" : "You";
+            messageDiv.appendChild(senderLabel);
+        } else {
+            messageDiv.classList.add("consecutive");
+        }
+
+        const textDiv = document.createElement("div");
+        textDiv.classList.add("text");
+        textDiv.innerHTML = message;
+
+        const timestamp = document.createElement("div");
+        timestamp.classList.add("timestamp");
+        timestamp.textContent = new Date().toLocaleTimeString();
+
+        messageDiv.appendChild(textDiv);
+        messageDiv.appendChild(timestamp);
+
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
+        lastSender = sender;
     }
 
     function appendMenuOptions(options) {
