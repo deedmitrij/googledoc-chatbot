@@ -1,5 +1,5 @@
 from typing import List
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from backend.app.langchain.chains import LLMChains
 from backend.services.google_drive_loader import GoogleDocLoader
 from backend.services.vector_db import VectorDB

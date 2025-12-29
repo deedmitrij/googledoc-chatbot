@@ -24,6 +24,8 @@ def chat():
     user_message = data.get("message")
 
     response = run_agent_with_tools(user_input=user_message, user_id=user_id)
+    memory_manager.store_message(user_id, user_message, response)
+
     try:
         response_as_dict = json.loads(response)
         return response_as_dict

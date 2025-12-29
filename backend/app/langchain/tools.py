@@ -1,14 +1,18 @@
 import json
 from pydantic import BaseModel, Field
-from langchain.tools import StructuredTool
+from langchain_core.tools import StructuredTool
 from backend.app.document_manager import DocumentManager
 from backend.app.langchain.chains import LLMChains
 from backend.app.memory_manager import ChatbotMemoryManager
+from backend.services.jira_service import JiraService
+from backend.services.github_service import GithubService
 
 
 memory_manager = ChatbotMemoryManager()
 document_manager = DocumentManager()
 llm_chains = LLMChains()
+jira_service = JiraService()
+github_service = GithubService()
 
 
 class UploadDocInput(BaseModel):
@@ -204,6 +208,125 @@ clear_session_tool = StructuredTool.from_function(
 )
 
 
+class CreateGithubFileInput(BaseModel):
+    file_path: str = Field(description="Path of the file to create in the GitHub repository")
+    content: str = Field(description="Content to write to the new file")
+    commit_message: str = Field(description="Commit message for the file creation")
+
+class UpdateGithubFileInput(BaseModel):
+    file_path: str = Field(description="Path of the file to update in the GitHub repository")
+    content: str = Field(description="New content for the file")
+    commit_message: str = Field(description="Commit message for the file update")
+
+class ReadGithubFileInput(BaseModel):
+    file_path: str = Field(description="Path of the file to read from the GitHub repository")
+
+class CreateGithubPullRequestInput(BaseModel):
+    title: str = Field(description="Title of the pull request")
+    body: str = Field(description="Body of the pull request")
+    head_branch: str = Field(description="The name of the branch where your changes are implemented")
+    base_branch: str = Field(description="The name of the branch you want the changes pulled into")
+
+
+def create_github_file(file_path: str, content: str, commit_message: str) -> str:
+    result = github_service.create_file(file_path, content, commit_message)
+    return result
+
+def update_github_file(file_path: str, content: str, commit_message: str) -> str:
+    result = github_service.update_file(file_path, content, commit_message)
+    return result
+
+def read_github_file(file_path: str) -> str:
+    content = github_service.read_file(file_path)
+    return content
+
+def create_github_pull_request(title: str, body: str, head_branch: str, base_branch: str) -> str:
+    pr_url = github_service.create_pull_request(title, body, head_branch, base_branch)
+    return f"Pull request created: {pr_url}"
+
+
+create_github_file_tool = StructuredTool.from_function(
+    name="Create GitHub File",
+    func=create_github_file,
+    description="Use this tool to create a new file in the GitHub repository.",
+    args_schema=CreateGithubFileInput,
+    return_direct=True
+)
+
+update_github_file_tool = StructuredTool.from_function(
+    name="Update GitHub File",
+    func=update_github_file,
+    description="Use this tool to update an existing file in the GitHub repository.",
+    args_schema=UpdateGithubFileInput,
+    return_direct=True
+)
+
+read_github_file_tool = StructuredTool.from_function(
+    name="Read GitHub File",
+    func=read_github_file,
+    description="Use this tool to read the contents of a file in the GitHub repository.",
+    args_schema=ReadGithubFileInput
+)
+
+create_github_pull_request_tool = StructuredTool.from_function(
+    name="Create GitHub Pull Request",
+    func=create_github_pull_request,
+    description="Use this tool to create a new pull request in the GitHub repository.",
+    args_schema=CreateGithubPullRequestInput,
+    return_direct=True
+)
+
+
+class CreateJiraTicketInput(BaseModel):
+    title: str = Field(description="Title of the Jira ticket")
+    description: str = Field(description="Description of the Jira ticket")
+    issue_type: str = Field(description="Type of the Jira ticket (e.g., Story, Bug, Task)")
+
+class UpdateJiraTicketInput(BaseModel):
+    ticket_key: str = Field(description="Key of the Jira ticket to update")
+    comment: str = Field(description="Comment to add to the Jira ticket")
+
+class GetJiraTicketInput(BaseModel):
+    ticket_key: str = Field(description="Key of the Jira ticket to retrieve")
+
+
+def create_jira_ticket(title: str, description: str, issue_type: str) -> str:
+    ticket_key = jira_service.create_ticket(title, description, issue_type)
+    return f"Jira ticket created with key: {ticket_key}"
+
+def update_jira_ticket(ticket_key: str, comment: str) -> str:
+    result = jira_service.update_ticket(ticket_key, comment)
+    return result
+
+def get_jira_ticket(ticket_key: str) -> str:
+    ticket = jira_service.get_ticket(ticket_key)
+    return json.dumps(ticket)
+
+
+create_jira_ticket_tool = StructuredTool.from_function(
+    name="Create Jira Ticket",
+    func=create_jira_ticket,
+    description="Use this tool to create a new Jira ticket.",
+    args_schema=CreateJiraTicketInput,
+    return_direct=True
+)
+
+update_jira_ticket_tool = StructuredTool.from_function(
+    name="Update Jira Ticket",
+    func=update_jira_ticket,
+    description="Use this tool to add a comment to an existing Jira ticket.",
+    args_schema=UpdateJiraTicketInput,
+    return_direct=True
+)
+
+get_jira_ticket_tool = StructuredTool.from_function(
+    name="Get Jira Ticket",
+    func=get_jira_ticket,
+    description="Use this tool to retrieve the details of a Jira ticket.",
+    args_schema=GetJiraTicketInput
+)
+
+
 # === Export All Tools as a List ===
 all_tools = [
     load_specification_doc_tool,
@@ -213,5 +336,14 @@ all_tools = [
     check_chat_history_tool,
     check_current_context_tool,
     upload_new_documents_tool,
-    clear_session_tool
+    clear_session_tool,
+    # Jira Tools
+    create_jira_ticket_tool,
+    update_jira_ticket_tool,
+    get_jira_ticket_tool,
+    # GitHub Tools
+    create_github_file_tool,
+    update_github_file_tool,
+    read_github_file_tool,
+    create_github_pull_request_tool
 ]

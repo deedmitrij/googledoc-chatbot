@@ -9,6 +9,16 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 GOOGLE_CREDENTIALS_PATH = os.getenv("GOOGLE_CREDENTIALS_PATH", "credentials.json")
 
+# Jira Configuration
+JIRA_SERVER = os.getenv("JIRA_SERVER")
+JIRA_USERNAME = os.getenv("JIRA_USERNAME")
+JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN")
+JIRA_PROJECT = os.getenv("JIRA_PROJECT")
+
+# GitHub Configuration
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_REPO = os.getenv("GITHUB_REPO")
+
 # Get the project's root directory
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 

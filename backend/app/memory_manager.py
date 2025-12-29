@@ -1,5 +1,5 @@
 from typing import Optional, Dict, Any
-from langchain.memory import ConversationBufferMemory
+from langchain_community.memory import ConversationBufferMemory
 from backend.services.gemini_service import GeminiService
 
 
