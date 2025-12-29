@@ -11,22 +11,22 @@ memory_manager = ChatbotMemoryManager()
 
 # Configure the MCP client
 mcp_client = MultiServerMCPClient({
-    "jira": {
+    "atlassian": {
         "transport": "stdio",
-        "command": "python",
-        "args": ["-m", "backend.mcp_servers.jira_mcp_server"],
+        "command": "npx",
+        "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/mcp"],
     },
     "github": {
         "transport": "stdio",
-        "command": "python",
-        "args": ["-m", "backend.mcp_servers.github_mcp_server"],
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "."],
     },
 })
 
 async def load_tools():
-    async with mcp_client.session("jira") as jira_session:
+    async with mcp_client.session("atlassian") as atlassian_session:
         async with mcp_client.session("github") as github_session:
-            jira_tools = await load_mcp_tools(jira_session)
+            jira_tools = await load_mcp_tools(atlassian_session)
             github_tools = await load_mcp_tools(github_session)
             return jira_tools + github_tools
 

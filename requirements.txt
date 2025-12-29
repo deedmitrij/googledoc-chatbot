@@ -13,3 +13,4 @@ jira
 PyGithub
 faiss-cpu
 langchain-mcp-adapters
+mcp-remote
