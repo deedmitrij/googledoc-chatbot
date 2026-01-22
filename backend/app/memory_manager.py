@@ -1,9 +1,5 @@
 from typing import Optional, Dict, Any
-from langchain.memory import ConversationBufferMemory
-from backend.services.gemini_service import GeminiService
-
-
-gemini_service = GeminiService()
+from langchain_classic.memory import ConversationBufferMemory
 
 
 class ChatbotMemoryManager:

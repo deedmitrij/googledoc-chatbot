@@ -1,14 +1,14 @@
-from langchain.prompts import PromptTemplate
+from langchain_classic.prompts import PromptTemplate
 from langchain_core.runnables import RunnableSequence
-from backend.services.gemini_service import GeminiService
-from backend.config import PROJECT_ROOT
+from backend.services.llm_service import LLMService
+from config import PROJECT_ROOT
 
 
 class LLMChains:
 
     def __init__(self):
-        gemini_service = GeminiService()
-        self.llm = gemini_service.langchain_model
+        llm_service = LLMService()
+        self.llm = llm_service.langchain_model
 
     @staticmethod
     def _get_prompt(prompt_file):

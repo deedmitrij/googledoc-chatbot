@@ -1,9 +1,9 @@
+import re
 from typing import List
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from backend.app.langchain.chains import LLMChains
 from backend.services.google_drive_loader import GoogleDocLoader
 from backend.services.vector_db import VectorDB
-from backend.services.gemini_service import GeminiService
+from backend.services.llm_service import LLMService
 
 
 class DocumentManager:
@@ -15,7 +15,7 @@ class DocumentManager:
     def __init__(self):
         self.google_doc_loader = GoogleDocLoader()
         self.vector_db = VectorDB()
-        self.gemini_service = GeminiService()
+        self.llm_service = LLMService()
         self.llm_chains = LLMChains()
 
     def load_and_store_document(self, doc_link: str, collection: str, user_id: str) -> None:
@@ -31,17 +31,11 @@ class DocumentManager:
         doc_content = self.google_doc_loader.load_document(doc_link)
 
         # Splits document content by 'Feature X:' blocks
-        regex_separator = r"(Feature \d+:.*?)(?=\n\s*Feature \d+:|\Z)"
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000000,
-            chunk_overlap=0,
-            separators=[regex_separator],
-            is_separator_regex=True
-        )
-        chunks_to_store = text_splitter.split_text(doc_content)
+        feature_pattern = r"(Feature \d+:.*?)(?=\n\s*Feature \d+:|\Z)"
+        chunks_to_store = re.findall(feature_pattern, doc_content, re.DOTALL)
 
         # Embed split features (chunks)
-        embeddings = self.embed_content(content=chunks_to_store, task_type='retrieval_document')
+        embeddings = self.embed_content(content=chunks_to_store, task_type='RETRIEVAL_DOCUMENT')
 
         # Create list of unique IDs for each document chunk
         doc_ids = [f"{user_id}_{collection}_f{i}" for i in range(len(chunks_to_store))]
@@ -64,7 +58,7 @@ class DocumentManager:
         Returns:
             List[List[float]] | List[float]: A list of vector embeddings for the provided content.
         """
-        return self.gemini_service.embed_content(content=content, task_type=task_type)
+        return self.llm_service.embed_content(content=content, task_type=task_type)
 
     def find_similar_data_to_query(self, query: str, collection: str, user_id: str) -> List[str]:
         """
@@ -78,7 +72,7 @@ class DocumentManager:
         Returns:
             List[str]: A list of found similar data.
         """
-        query_embedding = self.embed_content(content=query, task_type='retrieval_query')
+        query_embedding = self.embed_content(content=query, task_type='RETRIEVAL_QUERY')
         metadata = {"user_id": user_id}
         return self.vector_db.retrieve_relevant_data(
             query_embedding=query_embedding, collection=collection, metadata=metadata

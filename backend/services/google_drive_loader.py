@@ -2,7 +2,7 @@ import re
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
-from backend.config import GOOGLE_CREDENTIALS_PATH
+from config import GOOGLE_CREDENTIALS_PATH
 
 
 class GoogleDocLoader:
