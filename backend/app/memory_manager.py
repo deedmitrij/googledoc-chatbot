@@ -1,5 +1,6 @@
 from typing import Optional, Dict, Any
-from langchain_classic.memory import ConversationBufferMemory
+from backend.app.langchain.history import InMemoryHistory
+from langchain_core.messages import HumanMessage, AIMessage
 
 
 class ChatbotMemoryManager:
@@ -16,19 +17,17 @@ class ChatbotMemoryManager:
         return cls._instance
 
     def __init__(self):
-        self.user_memories: Dict[str, ConversationBufferMemory] = {}
+        self.user_memories: Dict[str, InMemoryHistory] = {}
         self.user_contexts: Dict[str, Dict[str, Any]] = {}
 
-    def get_memory(self, user_id: str) -> ConversationBufferMemory:
+    def get_memory(self, user_id: str) -> InMemoryHistory:
         if user_id not in self.user_memories:
-            self.user_memories[user_id] = ConversationBufferMemory(
-                memory_key="chat_history", return_messages=True
-            )
+            self.user_memories[user_id] = InMemoryHistory()
         return self.user_memories[user_id]
 
     def store_message(self, user_id: str, user_message: str, ai_message: str) -> None:
         memory = self.get_memory(user_id)
-        memory.save_context({"input": user_message}, {"output": ai_message})
+        memory.add_messages([HumanMessage(content=user_message), AIMessage(content=ai_message)])
 
     # --- Context Storage: key-value per user ---
     def set_context(self, user_id: str, key: str, value: Any) -> None:
