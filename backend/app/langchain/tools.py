@@ -1,6 +1,6 @@
 import json
 from pydantic import BaseModel, Field
-from langchain.tools import StructuredTool
+from langchain_classic.tools import StructuredTool
 from backend.app.document_manager import DocumentManager
 from backend.app.langchain.chains import LLMChains
 from backend.app.memory_manager import ChatbotMemoryManager
@@ -155,7 +155,7 @@ def check_current_context(user_id: str):
 check_current_context_tool = StructuredTool.from_function(
     name="Check the current context",
     description=(
-        "**ALWAYS** use this tool before responding to the user. "
+        "**ALWAYS** use this tool before choosing other tools. "
         "It returns the current dialogue context for a specific user based on what the bot expects next. "
         "The result might be a short instruction or a multi-line message with specific prompts. "
         "Use this tool to:\n"

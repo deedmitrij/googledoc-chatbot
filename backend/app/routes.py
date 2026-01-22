@@ -1,12 +1,7 @@
 import json
 from flask import Blueprint, request, jsonify, render_template
-from backend.app.document_manager import DocumentManager
 from backend.app.langchain.agent import run_agent_with_tools
-from backend.app.memory_manager import ChatbotMemoryManager
 
-
-memory_manager = ChatbotMemoryManager()
-document_manager = DocumentManager()
 
 chat_bp = Blueprint("chat", __name__)
 
@@ -20,12 +15,32 @@ def home():
 def chat():
     """Handles chatbot interactions."""
     data = request.get_json()
-    user_id = data.get("user_id")
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    user_id = data.get("user_id", "default_user")
     user_message = data.get("message")
 
-    response = run_agent_with_tools(user_input=user_message, user_id=user_id)
+    if not user_message:
+        return jsonify({"error": "No message provided"}), 400
+
     try:
-        response_as_dict = json.loads(response)
-        return response_as_dict
-    except json.JSONDecodeError:
-        return jsonify({"response": response})
+        # Call the Agent
+        response = run_agent_with_tools(user_input=user_message, user_id=user_id)
+
+        # Handle JSON response from LLM
+        if isinstance(response, str):
+            try:
+                # Attempt to parse if it's a JSON string
+                parsed_response = json.loads(response)
+                return jsonify(parsed_response)
+            except json.JSONDecodeError:
+                # Fallback if the LLM returned raw text
+                return jsonify({"response": response})
+
+        # If the response is already a dict
+        return jsonify(response)
+
+    except Exception as e:
+        return jsonify({"error": f"Agent Error: {str(e)}"}), 500

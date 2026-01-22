@@ -1,12 +1,12 @@
-from langchain.agents import AgentExecutor, StructuredChatAgent
-from langchain.prompts import MessagesPlaceholder
-from langchain.prompts.chat import ChatPromptTemplate
+from langchain_classic.agents import AgentExecutor, StructuredChatAgent
+from langchain_classic.prompts import MessagesPlaceholder
+from langchain_classic.prompts.chat import ChatPromptTemplate
 from backend.app.langchain.tools import all_tools
-from backend.services.gemini_service import GeminiService
+from backend.services.llm_service import LLMService
 from backend.app.memory_manager import ChatbotMemoryManager
 
 
-gemini_service = GeminiService()
+llm_service = LLMService()
 memory_manager = ChatbotMemoryManager()
 
 
@@ -17,7 +17,7 @@ def run_agent_with_tools(user_input: str, user_id: str) -> str:
         ('system',
          "You are a helpful assistant guiding users through a multi-step task "
          "(e.g., uploading and analyzing specification and test case documents). "
-         "Before answering any message from the user, you must **always call the `check_current_context` tool** "
+         "Before choosing any tool, you must **ALWAYS** call the `Check the current context` tool "
          "to understand the current step of the conversation and what the bot is expecting. "
          "Do not make assumptions or respond without consulting this context. "
          "If the context is ambiguous or if the user replies with a vague answer "
@@ -33,14 +33,14 @@ def run_agent_with_tools(user_input: str, user_id: str) -> str:
     ])
 
     agent = StructuredChatAgent.from_llm_and_tools(
-        llm=gemini_service.langchain_model,
+        llm=llm_service.langchain_model,
         tools=all_tools,
         prompt=prompt
     )
 
     agent_executor = AgentExecutor(
         agent=agent,
-        llm=gemini_service.langchain_model,
+        llm=llm_service.langchain_model,
         tools=all_tools,
         memory=memory,
         memory_key='chat_history',
