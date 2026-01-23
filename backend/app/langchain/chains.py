@@ -1,4 +1,4 @@
-from langchain_classic.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableSequence
 from backend.services.llm_service import LLMService
 from config import PROJECT_ROOT
