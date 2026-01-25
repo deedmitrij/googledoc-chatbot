@@ -12,21 +12,16 @@ llm_chains = LLMChains()
 
 
 class UploadDocInput(BaseModel):
-    user_id: str = Field(description="Unique identifier for the user")
     doc_link: str = Field(description="Link to Google document")
 
 
 class FeatureNameInput(BaseModel):
-    user_id: str = Field(description="Unique identifier for the user")
     feature_name: str = Field(description="Name of the feature for which to generate test cases")
 
 
-class UserIDInput(BaseModel):
-    user_id: str = Field(description="Unique identifier for the user")
-
-
 # === Tool 1: Load Specification document ===
-def load_specification_doc(user_id: str, doc_link: str) -> str:
+def load_specification_doc(doc_link: str) -> str:
+    user_id = memory_manager.current_user_id
     document_manager.load_and_store_document(doc_link=doc_link,
                                              collection='specification',
                                              user_id=user_id)
@@ -48,7 +43,8 @@ load_specification_doc_tool = StructuredTool.from_function(
 
 
 # === Tool 2: Load Test Cases document ===
-def load_test_cases_doc(user_id: str, doc_link: str) -> str:
+def load_test_cases_doc(doc_link: str) -> str:
+    user_id = memory_manager.current_user_id
     document_manager.load_and_store_document(doc_link=doc_link,
                                              collection='test_cases',
                                              user_id=user_id)
@@ -73,7 +69,8 @@ load_test_cases_doc_tool = StructuredTool.from_function(
 
 
 # === Tool 3: Specify feature name ===
-def specify_feature_name(user_id: str, feature_name: str) -> str:
+def specify_feature_name(feature_name: str) -> str:
+    user_id = memory_manager.current_user_id
     memory_manager.set_feature(user_id, feature_name)
     memory_manager.set_current_step(user_id, "Awaiting for generating test cases.")
 
@@ -89,7 +86,8 @@ specify_feature_name_tool = StructuredTool.from_function(
 
 
 # === Tool 4: Generate Test Cases ===
-def generate_test_cases(user_id: str) -> str:
+def generate_test_cases() -> str:
+    user_id = memory_manager.current_user_id
     feature_name = memory_manager.get_feature(user_id)
     relevant_specs = document_manager.find_similar_data_to_query(query=feature_name,
                                                                  collection='specification',
@@ -115,13 +113,13 @@ generate_test_cases_tool = StructuredTool.from_function(
     name="Generate Test Cases",
     func=generate_test_cases,
     description="Use this tool to generate test cases.",
-    args_schema=UserIDInput,
     return_direct=True
 )
 
 
 # === Tool 5: Fetch Chat History ===
-def fetch_chat_history(user_id: str):
+def fetch_chat_history():
+    user_id = memory_manager.current_user_id
     memory = memory_manager.get_memory(user_id)
     memory_vars = memory.load_memory_variables({})
     chat_history = memory_vars.get('chat_history', [])
@@ -140,13 +138,13 @@ check_chat_history_tool = StructuredTool.from_function(
         "Use it to verify details about previous links, answers, or messages before responding, "
         "especially if you are not certain from the memory context."
     ),
-    func=fetch_chat_history,
-    args_schema=UserIDInput
+    func=fetch_chat_history
 )
 
 
 # === Tool 6: Check the current context ===
-def check_current_context(user_id: str):
+def check_current_context():
+    user_id = memory_manager.current_user_id
     context = memory_manager.get_current_step(user_id)
 
     return context
@@ -164,13 +162,13 @@ check_current_context_tool = StructuredTool.from_function(
         "- Determine what kind of response or document link the user is expected to provide\n"
         "This tool must be called for **EVERY** user message before generating any reply or deciding on next actions."
     ),
-    func=check_current_context,
-    args_schema=UserIDInput
+    func=check_current_context
 )
 
 
 # === Tool 7: Upload new documents ===
-def upload_new_documents(user_id: str) -> str:
+def upload_new_documents() -> str:
+    user_id = memory_manager.current_user_id
     memory_manager.clear_context(user_id)
     memory_manager.set_current_step(user_id, "Awaiting for a link to Specification document")
 
@@ -179,14 +177,14 @@ def upload_new_documents(user_id: str) -> str:
 
 upload_new_documents_tool = StructuredTool.from_function(
     name="Upload new documents",
-    func=upload_new_documents,
     description="Use this tool to clear previously uploaded documents and wait for uploading new documents.",
-    args_schema=UserIDInput
+    func=upload_new_documents
 )
 
 
 # === Tool 8: Upload new documents ===
-def clear_session(user_id: str) -> str:
+def clear_session() -> str:
+    user_id = memory_manager.current_user_id
     memory_manager.clear_session(user_id)
     memory_manager.set_current_step(user_id, "Awaiting for a link to Specification document")
 
@@ -198,9 +196,8 @@ def clear_session(user_id: str) -> str:
 
 clear_session_tool = StructuredTool.from_function(
     name="Clear user session",
-    func=clear_session,
     description="Use this tool to clear the user session.",
-    args_schema=UserIDInput
+    func=clear_session
 )
 
 
