@@ -21,7 +21,7 @@ body {
 }
 
 .title {
-    text-align: center;
+    text-align: left;
     font-size: 24px;
     font-weight: 600;
     color: #333;
@@ -65,7 +65,7 @@ body {
 }
 
 .user .text {
-    background-color: #007bff;
+    background-color: #00c2ff;
     color: white;
     border-bottom-right-radius: 0;
 }
