@@ -11,23 +11,23 @@ memory_manager = ChatbotMemoryManager()
 
 
 def run_agent_with_tools(user_input: str, user_id: str) -> str:
+    memory_manager.current_user_id = user_id
     memory = memory_manager.get_memory(user_id)
+    current_step = memory_manager.get_current_step(user_id)
 
     prompt = ChatPromptTemplate.from_messages([
         ('system',
-         "You are a helpful assistant guiding users through a multi-step task "
-         "(e.g., uploading and analyzing specification and test case documents). "
-         "Before choosing any tool, you must **ALWAYS** call the `Check the current context` tool "
-         "to understand the current step of the conversation and what the bot is expecting. "
-         "Do not make assumptions or respond without consulting this context. "
-         "If the context is ambiguous or if the user replies with a vague answer "
-         "(e.g., 'yes', '1', 'ok', or a document link), use the context to determine what was expected. "
-         "If the context shows a prompt like a list of options, "
-         "and the user responds with a number or partial phrase, match that to the expected option. "
-         "If the user says something unrelated to the current context or skips steps, "
-         "guide them gently back to the expected step. "
-         "Always interpret the user’s reply based on the context returned by `check_current_context`. "
-         "If you need more information or context, ask for clarification."),
+         f"You are a helpful assistant guiding users through a multi-step task "
+         f"(e.g., uploading and analyzing specification and test case documents). "
+         f"Current conversation step: {current_step}. Choose the correct tool based ONLY on the current step. "
+         f"Do NOT call tools that do not match this step. "
+         f"If the context is ambiguous or if the user replies with a vague answer "
+         f"(e.g., 'yes', '1', 'ok', or a document link), use the context to determine what was expected. "
+         f"If the context shows a prompt like a list of options, "
+         f"and the user responds with a number or partial phrase, match that to the expected option. "
+         f"If the user says something unrelated to the current context or skips steps, "
+         f"guide them gently back to the expected step. "
+         f"If you need more information or context, ask for clarification."),
         MessagesPlaceholder(variable_name='chat_history'),
         ('human', '{input}')
     ])
@@ -48,8 +48,5 @@ def run_agent_with_tools(user_input: str, user_id: str) -> str:
         handle_parsing_errors=True
     )
 
-    # Add user_id to the input string
-    user_input_with_id = f"(User ID: {user_id}) {user_input}"
-    response = agent_executor.run(user_input_with_id)
-
-    return response
+    response = agent_executor.invoke({"input": user_input})
+    return response['output']

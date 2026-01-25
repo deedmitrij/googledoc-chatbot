@@ -18,6 +18,15 @@ class ChatbotMemoryManager:
     def __init__(self):
         self.user_memories: Dict[str, ConversationBufferMemory] = {}
         self.user_contexts: Dict[str, Dict[str, Any]] = {}
+        self._current_user_id: Optional[str] = None
+
+    @property
+    def current_user_id(self) -> Optional[str]:
+        return self._current_user_id
+
+    @current_user_id.setter
+    def current_user_id(self, user_id: str):
+        self._current_user_id = user_id
 
     def get_memory(self, user_id: str) -> ConversationBufferMemory:
         if user_id not in self.user_memories:

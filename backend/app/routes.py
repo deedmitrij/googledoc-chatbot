@@ -15,15 +15,8 @@ def home():
 def chat():
     """Handles chatbot interactions."""
     data = request.get_json()
-
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
-
-    user_id = data.get("user_id", "default_user")
+    user_id = data.get("user_id")
     user_message = data.get("message")
-
-    if not user_message:
-        return jsonify({"error": "No message provided"}), 400
 
     try:
         # Call the Agent
