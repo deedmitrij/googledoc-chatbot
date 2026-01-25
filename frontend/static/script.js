@@ -4,10 +4,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const sendBtn = document.getElementById("send-btn");
 
     function getUserId() {
-        let userId = sessionStorage.getItem("user_id");
+        let userId = localStorage.getItem("user_id");
         if (!userId) {
             userId = crypto.randomUUID();
-            sessionStorage.setItem("user_id", userId);
+            localStorage.setItem("user_id", userId);
         }
         return userId;
     }
@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const textDiv = document.createElement("div");
         textDiv.classList.add("text");
-        textDiv.innerHTML = message;
+        textDiv.innerHTML = linkify(message);
 
         const timestamp = document.createElement("div");
         timestamp.classList.add("timestamp");
@@ -100,5 +100,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function resetChat() {
         location.reload();
+    }
+
+    function linkify(text) {
+        // This regex looks for URLs starting with http/https or www.
+        // It also handles URLs without protocol but containing a domain.
+        const urlPattern = /((https?:\/\/|www\.)[\w\-]+(\.[\w\-]+)+[\w\-.,@?^=%&:/~+#]*[\w\-@?^=%&/~+#])|([a-zA-Z0-9.\-]+(?:\.[a-zA-Z]{2,})(?:[\w\-.,@?^=%&:/~+#]*[\w\-@?^=%&/~+#]))/gi;
+
+        return text.replace(urlPattern, url => {
+            // Check if the URL already starts with http:// or https://
+            let fullUrl = url;
+            if (!url.match(/^(https?:\/\/)/i)) {
+                // If it starts with www., add http://
+                if (url.match(/^www\./i)) {
+                    fullUrl = `http://${url}`;
+                } else if (url.match(/^[a-zA-Z0-9.\-]+(?:\.[a-zA-Z]{2,})/)) {
+                    // For bare domains like example.com, add http://
+                    fullUrl = `http://${url}`;
+                }
+            }
+            return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+        });
     }
 });
