@@ -12,8 +12,8 @@ This is a **Flask-based chatbot** built with **LangChain** and **RAG-powered LLM
    - [Orchestration & Prompting Layer](#2️⃣-orchestration--prompting-layer)
    - [Tools Layer](#3️⃣-tools-layer)
    - [Memory & State Management](#4️⃣-memory--state-management)
-2. [Tech Stack](#tech-stack)
-3. [Prerequisites](#prerequisites)
+2. [Tech Stack](#-tech-stack)
+3. [Prerequisites](#-prerequisites)
 4. [Setup Instructions](#%EF%B8%8F-setup-instructions)
    - [Clone the Repository](#1️⃣-clone-the-repository)
    - [Set Up a Virtual Environment](#2️⃣-set-up-a-virtual-environment)
@@ -25,7 +25,7 @@ This is a **Flask-based chatbot** built with **LangChain** and **RAG-powered LLM
    - [Hugging Face Inference API](#-hugging-face-inference-api)
 6. [How It Works](#-how-it-works)
 7. [How to Test](#-how-to-test)
-8. [License](#-license)
+8. [License](#%EF%B8%8F-license)
 
 ---
 
@@ -74,7 +74,7 @@ This application is built as an **AI-powered RAG (Retrieval-Augmented Generation
 
 ---
 
-## Tech Stack
+## 🧰 Tech Stack
 - **Python** - core backend
 - **Flask** – web interface / API layer
 - **LangChain** – RAG orchestration and prompt management
@@ -84,7 +84,7 @@ This application is built as an **AI-powered RAG (Retrieval-Augmented Generation
 
 ---
 
-## Prerequisites
+## 📋 Prerequisites
 - Python 3.10+
 - Hugging Face account
 - Google account with access to target Google Docs
@@ -181,5 +181,5 @@ You can test the chatbot manually using the web UI.
 
 ---
 
-## 🐝 License
+## 🛡️ License
 This project is **open-source** and available under the [MIT License](LICENSE).
