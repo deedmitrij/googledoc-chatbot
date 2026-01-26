@@ -7,7 +7,7 @@ This is a **Flask-based chatbot** built with **LangChain** and **RAG-powered LLM
 ---
 
 ## 📑 Table of Contents
-1. [Architecture Overview](#%F0%9F%A7%B1-architecture-overview)
+1. [Architecture Overview](#-architecture-overview)
    - [Retrieval Layer](#1️⃣-retrieval-layer)
    - [Orchestration & Prompting Layer](#2️⃣-orchestration--prompting-layer)
    - [Tools Layer](#3️⃣-tools-layer)
