@@ -7,25 +7,25 @@ This is a **Flask-based chatbot** built with **LangChain** and **RAG-powered LLM
 ---
 
 ## 📑 Table of Contents
-1. [Architecture Overview](#architecture-overview)
+1. [Architecture Overview](#%F0%9F%A7%B1-architecture-overview)
    - [Retrieval Layer](#1️⃣-retrieval-layer)
    - [Orchestration & Prompting Layer](#2️⃣-orchestration--prompting-layer)
    - [Tools Layer](#3️⃣-tools-layer)
    - [Memory & State Management](#4️⃣-memory--state-management)
 2. [Tech Stack](#tech-stack)
 3. [Prerequisites](#prerequisites)
-4. [Setup Instructions](#setup-instructions)
+4. [Setup Instructions](#%EF%B8%8F-setup-instructions)
    - [Clone the Repository](#1️⃣-clone-the-repository)
    - [Set Up a Virtual Environment](#2️⃣-set-up-a-virtual-environment)
    - [Install Dependencies](#3️⃣-install-dependencies)
    - [Configure Environment Variables](#4️⃣-configure-environment-variables)
    - [Run the Application](#5️⃣-run-the-application)
-5. [API Setup](#api-setup)
-   - [Google Docs API](#google-docs-api)
-   - [Hugging Face Inference API](#hugging-face-inference-api)
-6. [How It Works](#how-it-works)
-7. [How to Test](#how-to-test)
-8. [License](#license)
+5. [API Setup](#-api-setup)
+   - [Google Docs API](#%EF%B8%8F-google-docs-api)
+   - [Hugging Face Inference API](#-hugging-face-inference-api)
+6. [How It Works](#-how-it-works)
+7. [How to Test](#-how-to-test)
+8. [License](#-license)
 
 ---
 
